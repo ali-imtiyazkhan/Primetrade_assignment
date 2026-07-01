@@ -315,7 +315,3 @@ All API responses follow a consistent structure:
 This project is submitted as part of a **Backend Developer Intern** assignment.
 
 ---
-
-<div align="center">
-  <sub>Built with ❤️ by <a href="https://github.com/ali-imtiyazkhan">Ali Imtiyaz Khan</a></sub>
-</div>
