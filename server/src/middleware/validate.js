@@ -5,7 +5,7 @@ function validate(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const messages = errors.array().map(e => e.msg);
-    throw new AppError(messages.join('; '), 400);
+    return next(new AppError(messages.join('; '), 400));
   }
   next();
 }

@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const User = require('../models/User');
 const AppError = require('../utils/AppError');
 
@@ -68,7 +67,7 @@ async function refreshAccessToken(refreshToken) {
     throw new AppError('Invalid or expired refresh token', 401);
   }
 
-  const user = await User.findById(decoded.id);
+  const user = await User.findById(decoded.id).select('+refreshToken');
   if (!user || user.refreshToken !== refreshToken) {
     throw new AppError('Invalid refresh token', 401);
   }
