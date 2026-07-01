@@ -9,8 +9,12 @@ async function listProducts(query) {
   if (query.category) filter.category = query.category;
   if (query.search) filter.name = { $regex: query.search, $options: 'i' };
 
+  const sortField = query.sort || '-createdAt';
+  const sortOrder = sortField.startsWith('-') ? -1 : 1;
+  const sortKey = sortField.replace(/^-/, '');
+
   const [products, total] = await Promise.all([
-    Product.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }),
+    Product.find(filter).skip(skip).limit(limit).sort({ [sortKey]: sortOrder }),
     Product.countDocuments(filter),
   ]);
 

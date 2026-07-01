@@ -1,4 +1,5 @@
 const authService = require('../services/authService');
+const passwordService = require('../services/passwordService');
 const { sendSuccess } = require('../utils/apiResponse');
 
 async function register(req, res, next) {
@@ -34,4 +35,20 @@ async function me(req, res) {
   sendSuccess(res, { user: req.user });
 }
 
-module.exports = { register, login, refresh, logout, me };
+async function forgotPassword(req, res, next) {
+  try {
+    const { email } = req.body;
+    const resetToken = await passwordService.forgotPassword(email);
+    sendSuccess(res, { resetToken }, 'Password reset token generated');
+  } catch (err) { next(err); }
+}
+
+async function resetPassword(req, res, next) {
+  try {
+    const { token, password } = req.body;
+    await passwordService.resetPassword(token, password);
+    sendSuccess(res, null, 'Password reset successful');
+  } catch (err) { next(err); }
+}
+
+module.exports = { register, login, refresh, logout, me, forgotPassword, resetPassword };

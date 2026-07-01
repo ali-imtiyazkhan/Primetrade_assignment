@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -11,19 +12,23 @@ const swaggerSpec = require('./swagger');
 const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
+const userRoutes = require('./routes/users');
+const upload = require('./middleware/upload');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 validateEnv();
 
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: true,
 }));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10kb' }));
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -41,10 +46,15 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.post('/api/v1/upload', upload.single('image'), (req, res) => {
+  res.json({ success: true, data: { url: `/uploads/${req.file.filename}` } });
+});
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/users', userRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
